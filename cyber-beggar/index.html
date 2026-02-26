@@ -32,7 +32,7 @@
         #jar-buddy {
             position: fixed; top: 20%; left: 10%; width: 100px; height: 124px;
             z-index: 50; pointer-events: auto; cursor: grab; touch-action: none; 
-            transition: transform 0.2s ease; 
+            transition: transform 0.2s ease-out; 
         }
         #jar-inner { position: relative; width: 100%; height: 100%; animation: float 3s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
@@ -43,29 +43,56 @@
             100% { box-shadow: 0 0 20px rgba(255, 140, 0, 0.5), inset 4px 4px 0 rgba(255, 255, 255, 0.6), inset -4px -4px 0 rgba(255, 215, 0, 0.5); }
         }
 
-        /* Jar Anatomy */
         .jar-lid { position: absolute; top: 0; left: 26px; width: 48px; height: 12px; background-color: #FFD700; border: 4px solid #111; z-index: 4; box-shadow: inset 4px 4px 0 #FFF6A3, inset -4px -4px 0 #DAA520; }
         .jar-lid::after { content: ''; position: absolute; top: 4px; left: 16px; width: 16px; height: 4px; background-color: #111; }
         .jar-neck { position: absolute; top: 16px; left: 34px; width: 32px; height: 16px; background-color: rgba(255, 215, 0, 0.15); border-left: 4px solid #111; border-right: 4px solid #111; z-index: 3; box-shadow: inset 4px 0 0 rgba(255, 255, 255, 0.5); backdrop-filter: blur(4px); }
         .jar-body { position: absolute; top: 32px; left: 10px; width: 80px; height: 72px; border: 4px solid #111; background-color: rgba(255, 215, 0, 0.15); animation: neonPulse 3s infinite alternate ease-in-out; backdrop-filter: blur(4px); z-index: 2; overflow: hidden; }
         
-        /* 8-Bit Face */
+        /* 彩色粒子特效 */
+        .light-particle { position: absolute; width: 4px; height: 4px; border-radius: 0; z-index: 3; animation: floatUp 2s infinite linear; opacity: 0; }
+        .light-particle:nth-child(1) { left: 20%; background-color: #FFD700; box-shadow: 0 0 6px #FFD700; animation-delay: 0s; }
+        .light-particle:nth-child(2) { left: 50%; background-color: #FFA500; box-shadow: 0 0 6px #FFA500; animation-delay: 0.8s; }
+        .light-particle:nth-child(3) { left: 80%; background-color: #FFD700; box-shadow: 0 0 6px #FFD700; animation-delay: 1.5s; }
+        @keyframes floatUp { 0% { transform: translateY(60px) scale(0.5); opacity: 0; } 50% { opacity: 0.8; } 100% { transform: translateY(10px) scale(1); opacity: 0; } }
+
+        /* 8-Bit 表情库 */
         .pixel-face { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 28px; display: flex; flex-direction: column; align-items: center; z-index: 5; }
         .eyes { display: flex; justify-content: space-between; width: 100%; margin-bottom: 4px; }
         .eye { width: 8px; height: 8px; background-color: #111; }
         .mouth { width: 16px; height: 8px; background-color: transparent; border-bottom: 4px solid #111; border-left: 4px solid #111; border-right: 4px solid #111; }
         
-        /* Limbs */
-        .limb { position: absolute; background-color: #111; z-index: 1; transition: z-index 0.2s ease; }
+        #jar-buddy.happy .eye { height: 4px; margin-top: 4px; background-color: transparent; border-top: 4px solid #111; border-left: 4px solid #111; border-right: 4px solid #111; }
+        #jar-buddy.happy .mouth { width: 24px; height: 12px; background-color: #111; border: none; }
+        
+        #jar-buddy.excited .eye { width: 8px; height: 12px; }
+        #jar-buddy.excited .mouth { width: 12px; height: 12px; background-color: #111; border: none; position: relative; overflow: hidden; margin-top: 2px; }
+        #jar-buddy.excited .mouth::after { content: ''; position: absolute; bottom: 0; left: 2px; width: 8px; height: 4px; background-color: #FF6B6B; }
+
+        #jar-buddy.boring .eye { height: 4px; margin-top: 4px; }
+        #jar-buddy.boring .mouth { width: 12px; height: 4px; border: none; background-color: #111; }
+
+        #jar-buddy.wicked .eye { width: 12px; height: 4px; margin-top: 4px; }
+        #jar-buddy.wicked .eye:first-child { transform: rotate(20deg); }
+        #jar-buddy.wicked .eye:last-child { transform: rotate(-20deg); }
+        #jar-buddy.wicked .mouth { width: 24px; height: 4px; background-color: transparent; border-top: 4px solid #111; border-left: 4px solid #111; border-right: 4px solid #111; border-bottom: none; margin-top: 4px;}
+
+        #jar-buddy.kissing .eye { height: 4px; margin-top: 4px; }
+        #jar-buddy.kissing .mouth { width: 8px; height: 8px; border: 4px solid #111; border-radius: 50%; background: #FF6B6B; }
+        
+        /* 四肢与动作 */
+        .limb { position: absolute; background-color: #111; z-index: 1; }
         .arm { width: 24px; height: 4px; top: 60px; } 
         .left-arm { left: -14px; transform-origin: right center; transform: rotate(25deg); animation: idleArmL 2.5s infinite ease-in-out; }
         .right-arm { right: -14px; transform-origin: left center; transform: rotate(-25deg); animation: idleArmR 2.5s infinite ease-in-out; }
+        @keyframes idleArmL { 0%, 100% { transform: rotate(25deg); } 50% { transform: rotate(45deg); } }
+        @keyframes idleArmR { 0%, 100% { transform: rotate(-25deg); } 50% { transform: rotate(-45deg); } }
+        
         .leg { width: 4px; height: 16px; top: 112px; transform-origin: top center; }
         .leg::after { content: ''; position: absolute; bottom: 0; width: 12px; height: 4px; background-color: #111; } 
         .left-leg { left: 30px; transform: rotate(15deg); }
         .right-leg { right: 30px; transform: rotate(-15deg); }
 
-        /* Animation States */
+        /* 动画状态 */
         #jar-buddy.walking #jar-inner { animation: walkBob 0.3s infinite alternate ease-in-out; } 
         #jar-buddy.walking .left-leg { animation: walkLeft 0.4s infinite linear; }
         #jar-buddy.walking .right-leg { animation: walkRight 0.4s infinite linear; }
@@ -73,9 +100,21 @@
         @keyframes walkRight { 0%, 100% { transform: rotate(-15deg); } 50% { transform: rotate(30deg); } }
         @keyframes walkBob { 0% { transform: translateY(0px); } 100% { transform: translateY(-4px); } }
         
-        #jar-buddy.dragged { cursor: grabbing; }
+        /* 侧向旋转跳跃 */
+        #jar-buddy.side-jumping #jar-inner { animation: sideJumpSpin 0.6s ease-in-out forwards; }
+        @keyframes sideJumpSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 中奖旋转 */
+        #jar-buddy.jackpot-spin #jar-inner { animation: jackpotSpin 0.8s ease-in-out forwards; }
+        @keyframes jackpotSpin { 0% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-50px) rotate(180deg); } 100% { transform: translateY(0) rotate(360deg); } }
+
+        #jar-buddy.dragged { cursor: grabbing; z-index: 2000; }
         #jar-buddy.dragged #jar-inner { animation: dragWiggle 0.1s infinite alternate linear; }
         @keyframes dragWiggle { 0% { transform: rotate(-5deg); } 100% { transform: rotate(5deg); } }
+
+        .zzz { position: absolute; top: -20px; right: -20px; color: #f4f0ea; font-weight: bold; font-size: 16px; opacity: 0; pointer-events: none; }
+        #jar-buddy.snoozing .zzz { animation: zzzFloat 3s ease-in-out infinite; }
+        @keyframes zzzFloat { 0% { opacity: 0; transform: translateY(0); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-24px); } }
 
         /* --- 3. Interaction Components --- */
         #interaction-wrapper { display: flex; flex-direction: column; align-items: center; z-index: 10; width: 100%; max-width: 400px; }
@@ -93,34 +132,66 @@
         #blindbox:active { transform: translate(2px, 2px); box-shadow: 6px 6px 0px #111; }
         #skip-btn { display: none; margin-top: 15px; background: #FF6B6B; border: 4px solid #111; padding: 8px 20px; font-weight: bold; cursor: pointer; }
 
-        /* --- 4. Reward Card --- */
+        /* 硬币掉落动画 */
+        #coin {
+            position: absolute; top: -60px; width: 36px; height: 36px; background-color: #FFD700;
+            border: 4px solid #111; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 20px; box-shadow: inset -4px -4px 0 #DAA520;
+            opacity: 0; pointer-events: none; z-index: 11; color: #111;
+        }
+        .dropping { animation: dropCoin 0.7s cubic-bezier(0.5, 0, 0.5, 1) forwards; }
+        @keyframes dropCoin { 
+            0% { opacity: 1; top: -60px; transform: rotate(0deg); } 
+            80% { opacity: 1; top: 15px; transform: rotate(360deg); } 
+            100% { opacity: 0; top: 25px; } 
+        }
+
+        /* 星星爆发 */
+        .dynamic-star {
+            position: fixed; width: 12px; height: 12px; z-index: 9999; 
+            pointer-events: none; opacity: 1; border: 4px solid #111; 
+        }
+        .dynamic-star.burst { animation: starBurst 1s ease-out forwards; }
+        @keyframes starBurst {
+            0% { transform: translate(0,0) rotate(0deg) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) rotate(360deg) scale(1.5); opacity: 0; }
+        }
+
+        /* --- 4. Reward Card & Poster --- */
         #reward-card {
             display: none; background-color: #333; border: 4px solid #111; box-shadow: 8px 8px 0px #111; padding: 25px;
             width: 85%; max-width: 400px; text-align: center; animation: popIn 0.3s ease forwards;
+            line-height: 1.6; position: relative;
         }
         @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
+        .poster-svg { width: 100%; height: auto; border: 4px solid #111; margin-bottom: 15px; background: #222; }
+
         /* --- 5. Footer Widgets & Modals --- */
-        .cyber-link { color: #FFD700; text-decoration: none; border-bottom: 2px dashed #FFD700; transition: 0.2s; }
+        .cyber-link { color: #FFD700; text-decoration: none; border-bottom: 2px dashed #FFD700; }
         .cyber-link:hover { color: #FFF6A3; border-bottom-style: solid; }
-        
-        #bottom-widgets { position: fixed; bottom: 20px; left: 20px; display: flex; align-items: center; gap: 15px; z-index: 900; }
-        #visit-counter { opacity: 0.8; }
+        #bottom-widgets { position: fixed; bottom: 20px; left: 20px; display: flex; align-items: center; gap: 10px; z-index: 900; }
         #visit-counter img { border: 2px solid #111; box-shadow: 2px 2px 0 #FFD700; height: 24px; vertical-align: middle; }
-        
-        #settings-btn { 
-            background: #111; border: 2px solid #FFD700; color: #FFD700; cursor: pointer; 
-            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-            font-size: 16px; box-shadow: 2px 2px 0 #FFD700; transition: all 0.2s;
-        }
-        #settings-btn:hover { background: #FFD700; color: #111; }
+        #settings-btn { background: #111; border: 2px solid #FFD700; color: #FFD700; cursor: pointer; width: 32px; height: 32px; box-shadow: 2px 2px 0 #FFD700; }
         
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-box { background: #222; border: 4px solid #FFD700; padding: 30px; text-align: center; max-width: 85%; width: 360px; box-shadow: 8px 8px 0 #111; }
-        .modal-btn { background: #FFD700; border: 4px solid #111; color: #111; padding: 8px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 15px; }
         
-        #api-input { width: 90%; padding: 10px; background: #111; color: #fff; border: 2px solid #666; margin-top: 10px; font-family: monospace; outline: none; }
-        #api-input:focus { border-color: #FFD700; }
+        .modal-btn { 
+            background: #FFD700; border: 4px solid #111; color: #111; padding: 8px 20px; 
+            font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 15px;
+            font-family: inherit; letter-spacing: 2px;
+        }
+        
+        #easter-egg-btn { 
+            display: none; margin-top: 20px; border: 2px dashed #ccc; background:none; color:#ccc; padding:10px; cursor:pointer; 
+            font-family: inherit; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;
+        }
+
+        #reset-btn {
+            margin-top: 20px; padding: 10px; background: transparent; border: 2px solid #fff; color: #fff; cursor: pointer;
+            font-family: inherit; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -128,12 +199,13 @@
     <button id="lang-toggle">中文</button>
     <h1 id="site-title">[ 🕹️ Insert Coin for 30s Chill ☕ ]</h1>
 
-    <!-- Bug Buddy -->
     <div id="jar-buddy">
         <div id="jar-inner">
+            <div class="zzz">Zzz...</div>
             <div class="jar-lid"></div>
             <div class="jar-neck"></div> 
             <div class="jar-body">
+                <div class="light-particle"></div><div class="light-particle"></div><div class="light-particle"></div>
                 <div class="pixel-face">
                     <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
                     <div class="mouth"></div>
@@ -147,31 +219,28 @@
         </div>
     </div>
 
-    <!-- Controls -->
     <div id="interaction-wrapper">
         <input type="text" id="stress-input" placeholder="What's on your mind? (Optional)">
         <div id="interaction-container" style="position:relative; width:300px; height:100px; display:flex; justify-content:center;">
-            <div id="coin" style="position:absolute; top:-60px; opacity:0; font-size:24px; font-weight:bold; color:#FFD700;">$</div>
+            <div id="coin">$</div>
             <button id="blindbox">🎁 INSERT COIN 🎁</button>
         </div>
         <button id="skip-btn">I want it now!</button>
     </div>
 
-    <!-- Reward Result -->
     <div id="reward-card">
         <div id="reward-content"></div>
-        <button id="reset-btn" style="margin-top:20px; padding:10px; background:transparent; border:2px solid #fff; color:#fff; cursor:pointer; font-family:inherit;">Toss another?</button>
+        <button id="reset-btn">Toss another?</button>
     </div>
 
-    <button id="easter-egg-btn" style="display:none; margin-top:20px; border:2px dashed #ccc; background:none; color:#ccc; padding:10px; cursor:pointer; font-family:inherit;">find it interesting?</button>
+    <button id="easter-egg-btn">find it interesting?</button>
 
-    <!-- Support Modal -->
     <div id="support-modal" class="modal-overlay">
         <div class="modal-box">
             <div id="modal-text">✨ xoxo! please insert a real coin for me >u< ✨</div>
             <br>
             <div style="font-size: 0.9rem;">
-                <a href="https://yishuangguo.github.io/yishuangguo/" target="_blank" class="cyber-link">🌐 My GitHub (yishuangguo.github.io)</a>
+                <a href="https://yishuangguo.github.io/yishuangguo/" target="_blank" class="cyber-link">🌐 My GitHub</a>
                 <br><br>
                 <a href="mailto:guoyishuang.work@gmail.com" class="cyber-link">✉️ guoyishuang.work@gmail.com</a>
             </div>
@@ -180,21 +249,16 @@
         </div>
     </div>
 
-    <!-- API Settings Modal -->
     <div id="api-modal" class="modal-overlay">
         <div class="modal-box">
             <h3 style="margin-top:0; color:#FFD700;">⚙️ Setup API Key</h3>
-            <p style="font-size: 0.85rem; color: #aaa; text-align: left;">
-                Testing the AI feature? You can override the hardcoded key with your own Gemini API Key. It stays in your browser's local storage.
-            </p>
-            <input type="password" id="api-input" placeholder="Paste Gemini API Key here...">
+            <input type="password" id="api-input" placeholder="Paste Gemini API Key here..." style="width:90%; padding:8px; background:#111; color:#fff; border:2px solid #666;">
             <br><br>
             <button class="modal-btn" id="save-api-btn">Save</button>
-            <button class="modal-btn" style="background:#444; color:#fff; border-color:#222;" onclick="document.getElementById('api-modal').style.display='none'">Cancel</button>
+            <button class="modal-btn" style="background:#444; color:#fff; border-color:#222; letter-spacing:0;" onclick="document.getElementById('api-modal').style.display='none'">Cancel</button>
         </div>
     </div>
 
-    <!-- Bottom Widgets -->
     <div id="bottom-widgets">
         <div id="visit-counter" title="Total Visitors">
             <img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fyishuangguo.github.io%2Fyishuangguo%2F30s-chill&label=VISITS&labelColor=%23222&countColor=%23FFD700&style=flat-square" alt="VISITS">
@@ -204,23 +268,104 @@
 
     <script>
         // ==========================================
-        // 🔑 API KEY CONFIGURATION
+        // 🔑 API CONFIGURATION
         // ==========================================
-        
-        // PASTE YOUR KEY HERE:
         const hardcodedApiKey = "AIzaSyBGbuzspmaFbWdHW4oBDai_4eFUfU-mGdY"; 
-        
-        function getActiveApiKey() {
-            return localStorage.getItem('custom_gemini_api_key') || hardcodedApiKey;
-        }
+        function getActiveApiKey() { return localStorage.getItem('custom_gemini_api_key') || hardcodedApiKey; }
 
-        // --- 1. Language Data ---
+        // --- 1. Pool Data ---
         const langData = {
-            en: { title: "[ 🕹️ Insert Coin for 30s Chill ☕ ]", btnInsert: "🎁 INSERT COIN 🎁", consulting: "✨ CONSULTING ORACLE... ✨", oraclePrefix: "✨ <b>Oracle Says:</b> ", rewards: ["🧘 30s Chill: Stare at the wall.", "💧 Drink some water.", "🌬️ Deep breath.", "👀 Find a 90-degree angle in your room.", "🎨 Daily Color: #FF7F50 Coral.", "🫂 Give yourself a high-five."], btnEaster: "find it interesting?", inputPlaceholder: "What's on your mind? (Optional)", btnReset: "Toss another?", btnSkip: "I want it now!" },
-            zh: { title: "[ 🕹️ 投币获取30秒放松 ☕ ]", btnInsert: "🎁 投币 🎁", consulting: "✨ 神明算命中... ✨", oraclePrefix: "✨ <b>赛博神谕：</b> ", rewards: ["🧘 30秒放松：盯着墙壁放空。", "💧 喝三口水。", "🌬️ 闭眼深呼吸一次。", "👀 找找房间里完美的90度直角。", "🎨 今日色彩：#FF7F50 珊瑚色。", "🫂 给自己一个击掌。"], btnEaster: "觉得有趣吗？", inputPlaceholder: "有什么烦心事？(选填)", btnReset: "再来一次？", btnSkip: "我现在就要！" }
+            en: { 
+                title: "[ 🕹️ Insert Coin for 30s Chill ☕ ]", 
+                btnInsert: "🎁 INSERT COIN 🎁", 
+                consulting: "✨ CONSULTING ORACLE... ✨", 
+                oraclePrefix: "✨ <b>Oracle Says:</b> ",
+                jackpotTitle: "<b>✨ JACKPOT BONUS! ✨</b><br>You got a special buddy poster.<br>",
+                jackpotSub: "<small>Take a 30s visual break.</small>",
+                rewards: [
+                    "🧘 <b>30s Chill:</b> Stare at the wall and blink manually 10 times. Go.",
+                    "💧 <b>Hydration Check:</b> Take three sips of water. Now.",
+                    "🌬️ <b>Breathe:</b> Inhale 4s, Hold 4s, Exhale 4s. Repeat.",
+                    "👀 <b>Visual Diet:</b> Find a 90-degree angle in your room. Nice.",
+                    "🎨 <b>Daily Hex:</b> #FF7F50 Coral. Soft but energetic.",
+                    "🫂 <b>High Five:</b> Give yourself a literal high-five. You deserve it.",
+                    "🥠 <b>Anti-Fortune:</b> Your posture is mediocre. Sit up straight.",
+                    "🪙 <b>Cyber-Junk:</b> You found a pristine ASCII frog: (o_o)",
+                    "🐟 <b>Slacker Drill:</b> Press `Alt + Tab` once to maintain switching muscle memory.",
+                    "🔋 <b>Low Battery:</b> You're at 20%. Grab a snack for physical recharge.",
+                    "👍 <b>Thumb Gratitude:</b> Stare at your thumb for 10s. It worked hard today.",
+                    "🐱 <b>Cat Mode:</b> Pretend you are a cat and stretch. Meow optionally.",
+                    "👣 <b>Toe Awareness:</b> Wiggle your toes until they feel like individual entities.",
+                    "🖐️ <b>Friendly Wave:</b> Give a tiny wave to a nearby object.",
+                    "🐘 <b>Mental Art:</b> Close eyes and visualize a purple elephant wearing sunglasses.",
+                    "🕵️ <b>Spy Code:</b> Tap your desk in a rhythm like a secret spy code.",
+                    "👄 <b>Jaw Release:</b> Check if you are clenching your jaw. Release it now.",
+                    "🎡 <b>Wheee!:</b> Spin your chair exactly 360 degrees.",
+                    "🧱 <b>Boring Zen:</b> Find the most boring thing nearby and appreciate it for 5s.",
+                    "🌬️ <b>Oxygen Smile:</b> Smile at the air. It is full of oxygen for you.",
+                    "🧙 <b>Tech Wizard:</b> Adjust screen brightness by 1% then put it back. Wizardry.",
+                    "🎵 <b>Whisper Song:</b> Sing one line of your favorite song in a whisper.",
+                    "👅 <b>Tongue Gym:</b> Try to touch your nose with your tongue. Fail gracefully.",
+                    "🏋️ <b>Squat Master:</b> Stand up, sit down. Squat count: 1. Olympic level.",
+                    "🏠 <b>Ceiling Zen:</b> Look at the ceiling and wonder why it's there.",
+                    "🤪 <b>Reflection Face:</b> Make a silly face at yourself in your phone's black screen.",
+                    "🌽 <b>Pun Drill:</b> Think of a pun so bad it makes you groan.",
+                    "🧥 <b>Shoulder Check:</b> Check left shoulder. Then right. Both still there? Good.",
+                    "👨‍🚀 <b>Zero Gravity:</b> Imagine you are floating in space. No gravity, just chill.",
+                    "🤡 <b>Sarcastic Cheer:</b> Tell yourself 'You're doing great' in a sarcastic voice."
+                ],
+                btnEaster: "find it interesting?", inputPlaceholder: "What's on your mind? (Optional)", btnReset: "Toss another?", btnSkip: "I want it now!"
+            },
+            zh: { 
+                title: "[ 🕹️ 投币获取30秒放松 ☕ ]", 
+                btnInsert: "🎁 投币 🎁", 
+                consulting: "✨ 神明算命中... ✨", 
+                oraclePrefix: "✨ <b>赛博神谕：</b> ",
+                jackpotTitle: "<b>✨ 终极大奖！ ✨</b><br>你获得了一张专属小罐头海报。<br>",
+                jackpotSub: "<small>享受30秒的视觉放松吧。</small>",
+                rewards: [
+                    "🧘 <b>30秒放松：</b>盯着墙壁手动眨眼10次。开始。",
+                    "💧 <b>补充水分：</b>喝三口水。立刻。",
+                    "🌬️ <b>深呼吸：</b>吸气4秒，憋气4秒，呼气4秒。再来一次。",
+                    "👀 <b>结构欣赏：</b>看看房间里的90度直角。多完美。",
+                    "🎨 <b>今日色彩：</b>#FF7F50 珊瑚色。温柔又充满力量。",
+                    "🫂 <b>击掌：</b>给自己一个字面意义上的击掌。你值得。",
+                    "🥠 <b>反心灵鸡汤：</b>你现在的坐姿很烂。坐直了。",
+                    "🪙 <b>赛博破烂：</b>你捡到了一只完好无损的ASCII青蛙: (o_o)",
+                    "🐟 <b>摸鱼演练：</b>迅速按下 `Alt + Tab` 一次，保持流畅的切屏肌肉记忆。",
+                    "🔋 <b>物理充电：</b>你的能量已不足20%，请马上吃点零食。",
+                    "👍 <b>感谢拇指：</b>盯着大拇指看10秒。它今天为你辛苦了。",
+                    "🐱 <b>猫之伸展：</b>假装自己是一只猫并伸个懒腰。可以小声喵一下。",
+                    "👣 <b>脚趾觉醒：</b>动动脚趾，直到感觉到它们是独立的个体。",
+                    "🖐️ <b>友谊之手：</b>向离你最近的一个物体打个小招呼。",
+                    "🐘 <b>脑内艺术：</b>闭上眼，想象一只戴着墨镜的紫色大象。",
+                    "🕵️ <b>特工电码：</b>像发摩斯电码一样有节奏地敲敲桌子。",
+                    "👄 <b>咬肌放松：</b>检查下你是不是在咬紧牙关？松开它。",
+                    "🎡 <b>芜湖！：</b>把椅子转个 360 度。",
+                    "🧱 <b>无聊之禅：</b>找找房间里最无聊的东西，感谢它存在了5秒。",
+                    "🌬️ <b>氧气之吻：</b>对着空气笑一下，它全是为你准备的氧气。",
+                    "🧙 <b>科技大师：</b>把屏幕亮度调高1%再调回去。大师级别的操作。",
+                    "🎵 <b>低语歌者：</b>小声哼唱一句你最喜欢的歌。",
+                    "👅 <b>舌头体操：</b>尝试用舌头舔到鼻子。优雅地失败也没关系。",
+                    "🏋️ <b>深蹲大师：</b>起立，坐下。深蹲计数：1。奥运选手级别。",
+                    "🏠 <b>仰望苍穹：</b>抬头看看天花板，思考它存在的意义。",
+                    "🤪 <b>镜中颜艺：</b>对着手机黑屏的反光做个鬼脸。",
+                    "🌽 <b>极寒挑战：</b>想一个冷到掉渣的冷笑话，冷死自己。",
+                    "🧥 <b>双肩自检：</b>检查左肩，再检查右肩。都还在？很好。",
+                    "👨‍🚀 <b>零重力：</b>想象你正在太空漂浮。没有重力，只有放松。",
+                    "🤡 <b>高级阴阳：</b>用极其讽刺的语气对自己说：‘你做得真棒’。"
+                ],
+                btnEaster: "觉得有趣吗？", inputPlaceholder: "有什么烦心事？(选填)", btnReset: "再来一次？", btnSkip: "我现在就要！"
+            }
         };
 
+        const palettes = [
+            ['#FFD700', '#FF6B6B', '#4ECDC4', '#1A535C'], ['#E0C097', '#B85C38', '#5C3D2E', '#2D2424'], 
+            ['#A8E6CF', '#DCEDC1', '#FFD3B6', '#FFAAA5'], ['#111111', '#333333', '#555555', '#FFD700']  
+        ];
+
         let currentLang = 'en';
+        let coinCount = 0;
         const blindbox = document.getElementById('blindbox');
         const stressInput = document.getElementById('stress-input');
         const jarBuddy = document.getElementById('jar-buddy');
@@ -229,56 +374,141 @@
         const skipBtn = document.getElementById('skip-btn');
         const wrapper = document.getElementById('interaction-wrapper');
         const coin = document.getElementById('coin');
+        const easterEggBtn = document.getElementById('easter-egg-btn');
 
-        // --- API Modal Logic ---
-        document.getElementById('settings-btn').addEventListener('click', () => {
-            document.getElementById('api-input').value = localStorage.getItem('custom_gemini_api_key') || '';
-            document.getElementById('api-modal').style.display = 'flex';
-        });
+        // --- 2. Pet Engine ---
+        let jarX = window.innerWidth / 2 - 50, jarY = 150;
+        let targetX = jarX, targetY = jarY;
+        let jumpStartX = 0, jumpStartY = 0, jumpStartTime = 0;
+        let petState = 'idle'; 
+        let isDragging = false;
+        let petSpeed = 1.5;
 
-        document.getElementById('save-api-btn').addEventListener('click', () => {
-            const val = document.getElementById('api-input').value.trim();
-            if (val) localStorage.setItem('custom_gemini_api_key', val);
-            else localStorage.removeItem('custom_gemini_api_key');
-            document.getElementById('api-modal').style.display = 'none';
-        });
+        function pickNewTarget() {
+            if (petState !== 'idle' && petState !== 'walking') return;
+            targetX = Math.random() * (window.innerWidth - 120) + 10;
+            targetY = Math.random() * (window.innerHeight - 300) + 50;
+            petState = 'walking';
+            jarBuddy.className = 'walking';
+            jarBuddy.style.transform = targetX < jarX ? 'scaleX(-1)' : 'scaleX(1)';
+        }
 
-        // --- API Fetch ---
+        function updatePet() {
+            if (petState === 'dragged') {
+                jarBuddy.style.left = jarX + 'px';
+                jarBuddy.style.top = jarY + 'px';
+            }
+            else if (petState === 'jumping_aside') {
+                const p = (Date.now() - jumpStartTime) / 600;
+                if (p < 1) {
+                    jarX = jumpStartX + (targetX - jumpStartX) * p;
+                    jarY = jumpStartY + (targetY - jumpStartY) * p - Math.sin(p * Math.PI) * 100;
+                } else { jarX = targetX; jarY = targetY; }
+            }
+            else if (!isDragging && (petState === 'walking' || petState === 'busy')) {
+                const dx = targetX - jarX, dy = targetY - jarY;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 10) {
+                    if (petState === 'walking') {
+                        const r = Math.random();
+                        if (r < 0.15) { petState = 'snoozing'; jarBuddy.className = 'snoozing boring'; }
+                        else if (r < 0.3) { petState = 'happy'; jarBuddy.className = 'happy'; }
+                        else if (r < 0.45) { petState = 'wicked'; jarBuddy.className = 'wicked'; }
+                        else if (r < 0.6) { petState = 'kissing'; jarBuddy.className = 'kissing'; }
+                        else { petState = 'idle'; jarBuddy.className = ''; }
+                        setTimeout(() => { if(!isDragging && petState !== 'busy' && petState !== 'jumping_aside') pickNewTarget(); }, 3000);
+                    }
+                } else {
+                    jarX += (dx / dist) * petSpeed;
+                    jarY += (dy / dist) * petSpeed;
+                }
+            }
+            jarBuddy.style.left = jarX + 'px';
+            jarBuddy.style.top = jarY + 'px';
+            requestAnimationFrame(updatePet);
+        }
+
+        // --- 3. Effects Engine ---
+        function playPopSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(400, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.1);
+            } catch(e) {}
+        }
+
+        function createStarsBurst() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const colors = ['#FFD700', '#FFA500', '#FF8C00', '#FFF6A3']; 
+            for(let i=0; i < 24; i++) {
+                const star = document.createElement('div');
+                star.className = 'dynamic-star';
+                star.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                star.style.left = centerX + 'px'; star.style.top = centerY + 'px';
+                const angle = Math.random() * Math.PI * 2;
+                const dist = 100 + Math.random() * 200; 
+                star.style.setProperty('--dx', (Math.cos(angle) * dist) + 'px');
+                star.style.setProperty('--dy', (Math.sin(angle) * dist) + 'px');
+                document.body.appendChild(star);
+                requestAnimationFrame(() => star.classList.add('burst'));
+                setTimeout(() => star.remove(), 1000);
+            }
+        }
+
+        function generatePosterSVG() {
+            const p = palettes[Math.floor(Math.random() * palettes.length)];
+            const bg = p[0], ac1 = p[1], ac2 = p[2], ac3 = p[3];
+            return `<svg class="poster-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="background-color: ${bg}22">
+                <rect x="15" y="15" width="20" height="20" fill="${ac1}" opacity="0.6"/>
+                <rect x="65" y="65" width="25" height="15" fill="${ac2}" opacity="0.6"/>
+                <rect x="70" y="20" width="10" height="10" fill="${ac3}" opacity="0.8"/>
+                <g transform="translate(30, 25)">
+                    <rect x="8" y="0" width="24" height="6" fill="#FFD700" stroke="#111" stroke-width="2"/>
+                    <rect x="0" y="16" width="40" height="36" fill="rgba(255,215,0,0.5)" stroke="#111" stroke-width="2"/>
+                    <path d="M 12 28 Q 14 26 16 28" fill="none" stroke="#111" stroke-width="2"/>
+                    <path d="M 24 28 Q 26 26 28 28" fill="none" stroke="#111" stroke-width="2"/>
+                    <rect x="14" y="34" width="12" height="4" fill="#111"/>
+                </g>
+            </svg>`;
+        }
+
+        // --- 4. API & Interaction ---
         async function fetchGemini(prompt) {
             const key = getActiveApiKey();
             if (!key) return null;
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{ parts: [{ text: prompt }] }],
                         systemInstruction: { parts: [{ text: "Provide a sassy, short 30-second relaxation task. Max 2 sentences. Use emojis." }] }
                     })
                 });
-                if (!response.ok) return null;
                 const data = await response.json();
                 return data.candidates?.[0]?.content?.parts?.[0]?.text;
             } catch (e) { return null; }
         }
 
-        // --- Movement & Dragging ---
-        let jarX = 50, jarY = 50;
-        let isDragging = false;
-        
-        jarBuddy.onmousedown = (e) => { isDragging = true; jarBuddy.classList.add('dragged'); };
-        window.onmousemove = (e) => {
-            if (!isDragging) return;
-            jarBuddy.style.left = (e.clientX - 50) + 'px';
-            jarBuddy.style.top = (e.clientY - 60) + 'px';
-        };
-        window.onmouseup = () => { isDragging = false; jarBuddy.classList.remove('dragged'); };
-
-        // --- Interaction Logic ---
         blindbox.addEventListener('click', async () => {
             const stressText = stressInput.value.trim();
             const data = langData[currentLang];
             let dynamicReward = null;
+
+            playPopSound();
+            coin.classList.add('dropping');
+            
+            // Move Buddy to Box
+            const boxRect = blindbox.getBoundingClientRect();
+            targetX = boxRect.left - 20; targetY = boxRect.top - 80;
+            petState = 'busy'; petSpeed = 8; jarBuddy.className = 'walking excited';
 
             if (stressText) {
                 blindbox.innerText = data.consulting;
@@ -287,31 +517,42 @@
                 skipBtn.style.display = 'none';
             }
 
-            // Coin Drop Animation
-            coin.style.transition = 'none'; coin.style.top = '-60px'; coin.style.opacity = '1';
             setTimeout(() => {
-                coin.style.transition = 'all 0.6s cubic-bezier(0.5,0,0.5,1)';
-                coin.style.top = '20px'; coin.style.opacity = '0';
-            }, 10);
+                coin.classList.remove('dropping');
+                
+                // 侧翻动作
+                petState = 'jumping_aside';
+                const centerX = window.innerWidth / 2;
+                targetX = jarX < centerX ? centerX - 260 : centerX + 160;
+                targetY = window.innerHeight / 2 - 80;
+                jumpStartX = jarX; jumpStartY = jarY; jumpStartTime = Date.now();
+                jarBuddy.className = 'side-jumping excited';
 
-            // Buddy Action
-            jarBuddy.className = 'walking excited';
-            wrapper.style.display = 'none';
+                setTimeout(() => {
+                    const isJackpot = Math.random() < 0.2; 
+                    if (isJackpot) {
+                        petState = 'busy'; jarBuddy.className = 'jackpot-spin excited';
+                        createStarsBurst();
+                        rewardContent.innerHTML = data.jackpotTitle + generatePosterSVG() + data.jackpotSub;
+                    } else {
+                        petState = 'happy'; jarBuddy.className = 'happy';
+                        rewardContent.innerHTML = dynamicReward ? (data.oraclePrefix + dynamicReward) : data.rewards[Math.floor(Math.random()*data.rewards.length)];
+                    }
 
-            setTimeout(() => {
-                rewardContent.innerHTML = dynamicReward ? (data.oraclePrefix + dynamicReward) : data.rewards[Math.floor(Math.random()*data.rewards.length)];
-                rewardCard.style.display = 'block';
-                document.getElementById('easter-egg-btn').style.display = 'block';
-                blindbox.innerText = data.btnInsert;
+                    rewardCard.style.display = 'block';
+                    wrapper.style.display = 'none';
+                    blindbox.innerText = data.btnInsert;
+                    coinCount++;
+                    if (coinCount >= 5) easterEggBtn.style.display = 'block';
+                }, 600);
             }, 800);
         });
 
-        // --- Reset & Language ---
+        // --- 5. UI Logic ---
         document.getElementById('reset-btn').onclick = () => {
-            rewardCard.style.display = 'none';
-            wrapper.style.display = 'flex';
-            stressInput.value = '';
-            jarBuddy.className = '';
+            rewardCard.style.display = 'none'; wrapper.style.display = 'flex';
+            stressInput.value = ''; jarBuddy.className = '';
+            petState = 'idle'; petSpeed = 1.5; pickNewTarget();
         };
 
         document.getElementById('lang-toggle').onclick = () => {
@@ -326,9 +567,27 @@
             skipBtn.innerText = data.btnSkip;
         };
 
-        document.getElementById('easter-egg-btn').onclick = () => {
-            document.getElementById('support-modal').style.display = 'flex';
+        jarBuddy.onmousedown = (e) => {
+            if (petState === 'jumping_aside' || petState === 'busy') return;
+            isDragging = true; petState = 'dragged'; jarBuddy.className = 'dragged excited';
+            const rect = jarBuddy.getBoundingClientRect();
+            let offsetX = e.clientX - rect.left, offsetY = e.clientY - rect.top;
+            const move = (me) => { jarX = me.clientX - offsetX; jarY = me.clientY - offsetY; };
+            const up = () => { isDragging = false; petState = 'idle'; pickNewTarget(); window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+            window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
         };
+
+        document.getElementById('save-api-btn').onclick = () => {
+            const val = document.getElementById('api-input').value.trim();
+            if (val) localStorage.setItem('custom_gemini_api_key', val);
+            else localStorage.removeItem('custom_gemini_api_key');
+            document.getElementById('api-modal').style.display = 'none';
+        };
+
+        document.getElementById('settings-btn').onclick = () => document.getElementById('api-modal').style.display = 'flex';
+        document.getElementById('easter-egg-btn').onclick = () => document.getElementById('support-modal').style.display = 'flex';
+
+        window.onload = () => { updatePet(); setTimeout(pickNewTarget, 1000); };
     </script>
 </body>
 </html>
