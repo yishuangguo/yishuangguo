@@ -1,13 +1,580 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>My Creative Lab</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的像素世界 | Personal Portfolio</title>
+    <!-- 引入英文字体及网游常用免费开源中文字体 (思源黑体) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #ffffff; /* 无色背景 (白) */
+            --text-color: #000000; /* 纯黑文字 */
+            --primary: #000000; /* 主色：黑色框线 */
+            --secondary: #555555; /* 次色：深灰 (用于悬停和次要文字) */
+            --tertiary: #888888; /* 辅助色：中灰 */
+            --box-bg: #ffffff; /* 容器背景：纯白 */
+        }
+
+        * {
+            box-sizing: border-box;
+            cursor: crosshair; /* 像素十字光标 */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: var(--text-color);
+            font-family: 'VT323', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .pixel-font {
+            font-family: 'Press Start 2P', 'Noto Sans SC', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 像素风容器 - 实体黑白框线 */
+        .pixel-box {
+            background-color: var(--box-bg);
+            border: 3px solid var(--primary);
+            box-shadow: 8px 8px 0px var(--primary);
+            padding: 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .pixel-box:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0px var(--primary);
+        }
+
+        /* 头部区域 */
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            margin-top: 2rem;
+        }
+
+        .avatar {
+            font-size: 3rem; /* 减小头像字号 */
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* 打字机特效 */
+        .typewriter h1 {
+            color: var(--primary);
+            font-size: 1.4rem; /* 减小标题字号 */
+            overflow: hidden;
+            border-right: .15em solid var(--primary);
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: 
+                typing 3.5s steps(40, end),
+                blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary); }
+        }
+
+        /* 作品网格 */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background-color: var(--box-bg);
+            border: 3px solid var(--primary);
+            box-shadow: 6px 6px 0px var(--primary);
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 10px 10px 0px var(--primary);
+        }
+
+        /* 作品展示窗口 */
+        .project-preview {
+            width: 100%;
+            height: 160px;
+            background-color: #f5f5f5; /* 浅灰底 */
+            border: 2px solid var(--primary);
+            margin-bottom: 1rem;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .project-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s;
+            filter: grayscale(100%); /* 默认黑白滤镜 */
+        }
+
+        /* 鼠标悬停时图片微微放大，并恢复色彩 */
+        .project-card:hover .project-preview img {
+            transform: scale(1.1);
+            filter: grayscale(0%);
+        }
+
+        .preview-placeholder {
+            color: #555;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            text-align: center;
+            padding: 1rem;
+            line-height: 1.5;
+        }
+
+        .project-title {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .project-desc {
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        /* 按钮 - 黑白框线反色风格 */
+        .pixel-btn {
+            display: inline-block;
+            background-color: var(--box-bg);
+            color: var(--primary);
+            font-family: 'Press Start 2P', 'Noto Sans SC', sans-serif; /* 统一加入思源黑体作为中文备选 */
+            text-decoration: none;
+            padding: 0.8rem 1.2rem;
+            font-size: 0.7rem;
+            border: 3px solid var(--primary);
+            box-shadow: 4px 4px 0px var(--primary);
+            transition: all 0.1s;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .pixel-btn:hover {
+            background-color: var(--primary);
+            color: var(--box-bg);
+            box-shadow: 2px 2px 0px var(--primary);
+            transform: translate(2px, 2px);
+        }
+
+        .pixel-btn:active {
+            box-shadow: 0 0 0 var(--primary);
+            transform: translate(4px, 4px);
+        }
+
+        /* 表单样式 */
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .form-group label {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-control {
+            background-color: var(--box-bg);
+            border: 2px solid var(--primary);
+            color: var(--text-color);
+            padding: 0.8rem;
+            font-family: 'VT323', 'Noto Sans SC', sans-serif;
+            font-size: 1.2rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            box-shadow: 4px 4px 0px var(--primary);
+            transform: translate(-2px, -2px);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* --- 多语言与弹窗样式 --- */
+        body.en .zh { display: none; }
+        body.zh .en { display: none; }
+
+        .lang-btn {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 100;
+            padding: 0.5rem 0.8rem;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.9); /* 白底半透明 */
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -45%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 500px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            margin-bottom: 0; 
+        }
+
+        .modal.active, .modal-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        .modal.active {
+            transform: translate(-50%, -50%);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: var(--primary);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-family: 'VT323', monospace;
+        }
+        
+        .close-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* More Coming 区域 */
+        .more-coming {
+            text-align: center;
+            margin-top: 5rem;
+            margin-bottom: 3rem;
+        }
+
+        .more-text {
+            color: var(--primary);
+            font-size: 1.5rem;
+            text-shadow: 3px 3px 0px #ccc;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; text-shadow: 3px 3px 0px #ccc; }
+            50% { opacity: 0.3; text-shadow: 1px 1px 0px #ccc; }
+            100% { opacity: 1; text-shadow: 3px 3px 0px #ccc; }
+        }
+
+        /* 鼠标洒落的像素粒子 */
+        .mouse-pixel {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary);
+            border: 1px solid #000; /* 加边框确保在白色背景下可见 */
+            pointer-events: none;
+            z-index: 1000;
+            transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .typewriter h1 { font-size: 1.1rem; }
+            .container { padding: 1rem; }
+            .pixel-box { padding: 1.5rem; }
+        }
+    </style>
 </head>
-<body>
-<ul>
-    <li>
-        <a href="cyber-beggar/index.html">Visit the Cyber-Beggar (Bug仔)</a>
-    </li>
-</ul>
+<body class="zh"> <!-- 默认语言为中文 -->
+
+    <!-- 中英文切换按钮 -->
+    <button class="pixel-btn lang-btn" onclick="toggleLang()">
+        <span class="zh">EN</span>
+        <span class="en">中</span>
+    </button>
+
+    <div class="container">
+        <!-- 头部信息 -->
+        <header>
+            <div class="avatar">👾</div>
+            <div class="typewriter">
+                <h1>HELLO, I'M yishuang</h1>
+            </div>
+            <p style="margin-top: 1.5rem; color: var(--secondary);">
+                WEB DESIGNER / DEVELOPER / PIXEL LOVER
+            </p>
+        </header>
+
+        <!-- 作品展示 (移到了最前面) -->
+        <section id="projects" style="margin-bottom: 4rem;">
+            <h2 class="pixel-font" style="text-align: center; margin-bottom: 2rem; color: var(--primary); text-shadow: 3px 3px 0px #ccc;">
+                <span class="zh">MY PORTFOLIO</span>
+                <span class="en">MY PORTFOLIO</span>
+            </h2>
+            
+            <div class="projects-grid">
+                <!-- 项目 1: 30s chill -->
+                <div class="project-card">
+                    <div class="project-preview">
+                        <img src="https://images.unsplash.com/photo-1557682250-33bd709cbe85?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="30s Chill Preview" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="preview-placeholder" style="display: none;">[IMAGE<br>PREVIEW]</div>
+                    </div>
+                    <h3 class="project-title pixel-font">30s Chill</h3>
+                    <p class="project-desc">
+                        <span class="zh">一个极简设计的沉浸式网页，让你在30秒内放松身心，享受chill时光。</span>
+                        <span class="en">A minimalist immersive webpage that helps you relax and enjoy a chill moment in 30 seconds.</span>
+                    </p>
+                    <a href="cyber-beggar/index.html" target="_blank" class="pixel-btn">
+                        <span class="zh">PLAY_DEMO</span>
+                        <span class="en">PLAY_DEMO</span>
+                    </a> 
+                </div>
+
+                <!-- 项目 2: 占位 -->
+                <div class="project-card">
+                    <div class="project-preview">
+                        <div class="preview-placeholder">IMAGE<br>COMING SOON</div>
+                    </div>
+                    <h3 class="project-title pixel-font">Project 02</h3>
+                    <p class="project-desc">
+                        <span class="zh">（在此处补充你的另一个设计网页或作品的描述。）</span>
+                        <span class="en">(Add the description for your other design webpage or project here.)</span>
+                    </p>
+                    <a href="#" target="_blank" class="pixel-btn">
+                        <span class="zh">VIEW_PROJECT</span>
+                        <span class="en">VIEW_PROJECT</span>
+                    </a>
+                </div>
+
+                <!-- 项目 3: 占位 -->
+                <div class="project-card">
+                    <div class="project-preview">
+                        <div class="preview-placeholder">IMAGE<br>COMING SOON</div>
+                    </div>
+                    <h3 class="project-title pixel-font">Design Lab</h3>
+                    <p class="project-desc">
+                        <span class="zh">UI/UX 设计实验，探索创新的网页视觉效果与交互。</span>
+                        <span class="en">UI/UX design experiments, exploring innovative web visual effects and interactions.</span>
+                    </p>
+                    <a href="#" target="_blank" class="pixel-btn">
+                        <span class="zh">VIEW_PROJECT</span>
+                        <span class="en">VIEW_PROJECT</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于我 (移到了作品下方，作为次要信息) -->
+        <section class="pixel-box" id="about">
+            <h2 class="pixel-font" style="color: var(--primary); font-size: 1.2rem; margin-top: 0;">
+                <span class="zh">> ABOUT_ME.TXT</span>
+                <span class="en">> ABOUT_ME.TXT</span>
+            </h2>
+            <p>
+                <span class="zh">欢迎来到我的数字基地！我是一名热爱设计的创作者。（在此处补充你的个人简介、教育背景、兴趣爱好等。支持多行文本，字体已经调整为易于阅读的复古样式。）</span>
+                <span class="en">Welcome to my digital base! I am a creator passionate about design. (Supplement your personal intro, education, hobbies here. Supports multi-line text.)</span>
+            </p>
+            <p style="color: var(--secondary);">
+                <span class="zh">> STATUS: 正在探索更有趣的交互体验...</span>
+                <span class="en">> STATUS: Exploring more interesting interactive experiences...</span>
+            </p>
+        </section>
+
+        <!-- 更多即将到来 -->
+        <section class="more-coming">
+            <div class="more-text pixel-font">
+                ... MORE COMING SOON ...
+            </div>
+        </section>
+
+        <!-- 反馈提交按钮 (替代原本巨大的表单) -->
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <button class="pixel-btn" onclick="openModal()" style="font-size: 1rem; padding: 1rem 2rem;">
+                <span class="zh">✉️ SEND_TRANSMISSION (联系我)</span>
+                <span class="en">✉️ SEND_TRANSMISSION (Contact Me)</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- 反馈提交弹窗 (Modal) -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+    <div class="pixel-box modal" id="feedbackModal">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 class="pixel-font" style="color: var(--primary); font-size: 1.2rem; margin-top: 0; text-align: center;">
+            <span class="zh">> SEND_TRANSMISSION</span>
+            <span class="en">> SEND_TRANSMISSION</span>
+        </h2>
+        <p style="text-align: center; color: var(--secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">
+            <span class="zh">在这里留下你的想法，系统会将其以邮件形式投递至我的终端。</span>
+            <span class="en">Leave your thoughts here, the system will deliver them to my terminal via email.</span>
+        </p>
+        
+        <form action="https://formsubmit.co/guoyishuang.work@gmail.com" method="POST" class="feedback-form" style="margin-top: 0;">
+            <input type="hidden" name="_subject" value="来自个人主页的新留言！">
+            
+            <div class="form-group">
+                <label class="pixel-font" style="font-size: 0.8rem;">SUMMONER_NAME:</label>
+                <input type="text" name="name" class="form-control" required placeholder="你的称呼 / Your Name">
+            </div>
+            
+            <div class="form-group">
+                <label class="pixel-font" style="font-size: 0.8rem;">CONTACT_EMAIL:</label>
+                <input type="email" name="email" class="form-control" required placeholder="你的邮箱 / Your Email (Optional)">
+            </div>
+            
+            <div class="form-group">
+                <label class="pixel-font" style="font-size: 0.8rem;">MESSAGE_PAYLOAD:</label>
+                <textarea name="message" class="form-control" required placeholder="输入你要发送的信息... / Enter your message..."></textarea>
+            </div>
+            
+            <button type="submit" class="pixel-btn" style="align-self: center; margin-top: 1rem;">
+                <span class="zh">INITIATE_TRANSFER</span>
+                <span class="en">INITIATE_TRANSFER</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- 交互脚本 -->
+    <script>
+        // --- 新增：中英文切换逻辑 ---
+        function toggleLang() {
+            const body = document.body;
+            if (body.classList.contains('zh')) {
+                body.classList.remove('zh');
+                body.classList.add('en');
+            } else {
+                body.classList.remove('en');
+                body.classList.add('zh');
+            }
+        }
+
+        // --- 新增：弹窗控制逻辑 ---
+        function openModal() {
+            document.getElementById('modalOverlay').style.display = 'block';
+            document.getElementById('feedbackModal').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('modalOverlay').classList.add('active');
+                document.getElementById('feedbackModal').classList.add('active');
+            }, 10);
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.getElementById('feedbackModal').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('modalOverlay').style.display = 'none';
+                document.getElementById('feedbackModal').style.display = 'none';
+            }, 300);
+        }
+
+        // 鼠标移动洒落像素粒子特效 - 替换为黑白灰主题色
+        const colors = ['#000000', '#555555', '#999999', '#ffffff'];
+        let lastTime = 0;
+
+        document.addEventListener('mousemove', function(e) {
+            // 控制生成频率，避免页面卡顿
+            const now = Date.now();
+            if (now - lastTime < 30) return; 
+            lastTime = now;
+
+            // 创建像素方块
+            const pixel = document.createElement('div');
+            pixel.className = 'mouse-pixel';
+            
+            // 随机颜色
+            pixel.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // 跟随鼠标位置
+            pixel.style.left = e.pageX + 'px';
+            pixel.style.top = e.pageY + 'px';
+            
+            document.body.appendChild(pixel);
+
+            // 触发动画：随机向下飘落并消失
+            setTimeout(() => {
+                const randomX = (Math.random() - 0.5) * 50;
+                const randomY = Math.random() * 50 + 20;
+                pixel.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${Math.random() * 90}deg)`;
+                pixel.style.opacity = '0';
+            }, 50);
+
+            // 动画结束后移除元素
+            setTimeout(() => {
+                pixel.remove();
+            }, 850);
+        });
+    </script>
 </body>
 </html>
