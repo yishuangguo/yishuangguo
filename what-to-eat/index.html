@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What To Eat Next? - Pixel Slots</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+KuaiLe&display=swap');
+
+        :root {
+            --bg-color: #2b2b36;
+            --machine-color: #fbf236;      /* 黄色主体 */
+            --machine-dark: #df7126;       /* 黄色的暗部/橙色 */
+            --machine-light: #ffffa6;      /* 黄色的亮部 */
+            --machine-accent: #306082;     /* 蓝色面板 */
+            --machine-marquee: #224c73;    /* 深蓝顶棚 */
+            --screen-bg: #1a1c2c;
+            --text-light: #f4f4f4;
+            --text-dark: #1a1c2c;
+            --gold: #fbf236;
+            --pixel-size: 4px;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 32px 32px;
+            font-family: 'Press Start 2P', 'ZCOOL KuaiLe', 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            color: var(--text-light);
+        }
+
+        /* --- 动态双语排版适配 --- */
+        h1 {
+            text-align: center;
+            text-shadow: 4px 4px 0px #000;
+            color: var(--gold);
+            animation: bounce 2s infinite;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        body.lang-zh h1 {
+            font-size: 44px;
+            letter-spacing: 16px;
+            margin-bottom: 20px;
+        }
+
+        body.lang-en h1 {
+            font-size: 32px;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+
+        body.lang-zh .label {
+            font-size: 18px;
+            letter-spacing: 4px;
+        }
+
+        body.lang-en .label {
+            font-size: 14px;
+            letter-spacing: 0;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .arcade-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* 统一使用 8px 黑色外沿形成整体像素轮廓 */
+        .machine {
+            background-color: var(--machine-color);
+            padding: 30px;
+            border: 8px solid #000;
+            border-radius: 0;
+            box-shadow: 
+                inset 8px 8px 0px var(--machine-light),
+                inset -8px -8px 0px var(--machine-dark),
+                0 16px 32px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- 跑马灯顶棚 --- */
+        .machine-marquee {
+            background: var(--machine-marquee);
+            margin: -30px -30px 20px -30px;
+            padding: 20px;
+            border-bottom: 8px solid #000;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            box-shadow: inset 0 8px 0 rgba(95,205,228,0.2);
+        }
+
+        .marquee-light {
+            width: 16px;
+            height: 16px;
+            background: var(--gold);
+            border: 4px solid #000;
+            box-shadow: inset -2px -2px 0 #df7126, 0 0 10px var(--gold);
+            animation: blink 0.8s infinite alternate;
+        }
+        .marquee-light:nth-child(even) { animation-delay: 0.4s; }
+        .marquee-light:nth-child(3) { width: 24px; height: 24px; }
+
+        @keyframes blink {
+            0% { opacity: 0.3; box-shadow: none; }
+            100% { opacity: 1; box-shadow: inset -2px -2px 0 #df7126, 0 0 15px var(--gold); }
+        }
+
+        .screen {
+            background-color: var(--screen-bg);
+            padding: 20px;
+            border: 8px solid #5fcde4; /* 加粗屏幕边框 */
+            box-shadow: 
+                inset 6px 6px 0px #000,
+                inset -6px -6px 0px rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+        }
+
+        .labels {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .label {
+            width: 120px;
+            text-align: center;
+            color: #5fcde4;
+            text-shadow: 2px 2px 0px #000;
+            transition: all 0.3s;
+        }
+
+        .slots {
+            display: flex;
+            gap: 10px;
+            background: #000;
+            padding: 10px;
+            border: 8px solid #5a6988; /* 加粗转轴背景框 */
+            box-shadow: inset 4px 4px 8px rgba(0,0,0,0.8);
+        }
+
+        .column-wrapper {
+            width: 120px;
+            height: 120px;
+            overflow: hidden;
+            background: #f4f4f4;
+            border: 4px solid #1a1c2c;
+            position: relative;
+            box-shadow: inset 4px 4px 0px rgba(0,0,0,0.2);
+        }
+
+        .column-wrapper::before, .column-wrapper::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+            z-index: 2;
+        }
+        .column-wrapper::after {
+            bottom: 0;
+            top: auto;
+            background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+        }
+
+        .reel {
+            display: flex;
+            flex-direction: column;
+            will-change: transform;
+        }
+
+        .reel.blur {
+            filter: blur(1px);
+        }
+
+        .item {
+            width: 120px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'ZCOOL KuaiLe', sans-serif;
+            color: var(--text-dark);
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .item img {
+            width: 64px;
+            height: 64px;
+            image-rendering: pixelated;
+            margin-bottom: 5px;
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.2));
+        }
+
+        /* --- 底部投币口面板 --- */
+        .machine-bottom {
+            background: var(--machine-accent);
+            margin-top: 20px;
+            padding: 15px;
+            border: 8px solid #000; /* 与全身边框统一 */
+            box-shadow: inset 4px 4px 0 rgba(95,205,228,0.3);
+            display: flex;
+            justify-content: flex-end; /* 投币口推向右侧 */
+            align-items: center;
+            min-height: 90px;
+            position: relative;
+            z-index: 15;
+        }
+
+        .coin-slot-wrapper {
+            position: relative;
+            width: 80px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 投币口的黑色背景深渊 */
+        .coin-slot-hole {
+            position: absolute;
+            top: 22px;
+            left: 4px;
+            width: 72px;
+            height: 16px;
+            background: #000;
+            border: 4px solid #1a1c2c;
+            box-shadow: inset 0 4px 0 rgba(0,0,0,0.5);
+            z-index: 5;
+        }
+
+        /* 尺寸与食材图标完全一致的 64x64 金币 */
+        .anim-coin {
+            width: 64px;
+            height: 64px;
+            position: absolute;
+            top: -40px;
+            left: 8px; /* 居中 (80-64)/2 */
+            opacity: 0;
+            z-index: 10; /* 层级在黑洞上方，面板下方 */
+            image-rendering: pixelated;
+        }
+
+        /* 覆盖在金币上方的下半部面板挡板 */
+        .coin-slot-front {
+            position: absolute;
+            top: 34px;
+            left: 4px;
+            width: 72px;
+            height: 40px;
+            background: var(--machine-accent);
+            border-top: 4px solid #1a1c2c;
+            z-index: 20;
+        }
+
+        @keyframes insertCoin {
+            0% { transform: translateY(0); opacity: 0; }
+            10% { transform: translateY(-20px); opacity: 1; } /* 往上抛 */
+            30% { transform: translateY(10px); opacity: 1; } /* 落下 */
+            60% { transform: translateY(80px); opacity: 1; } /* 完全滑入投币口内部 */
+            65% { transform: translateY(80px); opacity: 0; } /* 消失 */
+            100% { transform: translateY(80px); opacity: 0; }
+        }
+
+        .anim-coin.play {
+            animation: insertCoin 0.6s ease-in forwards;
+        }
+
+        /* --- 居中吐纸出口（修复了遮挡与位置） --- */
+        .printer-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 10px; /* 定位在蓝色面板偏下方 */
+            width: 240px;
+            z-index: 30; /* 提升层级，让吐出的纸能垂挂在底框前 */
+        }
+
+        .printer-slit {
+            width: 100%;
+            height: 12px;
+            background: #000;
+            border: 4px solid #1a1c2c;
+            border-bottom: 2px solid #5a6988;
+            box-shadow: inset 0 6px 0 rgba(0,0,0,0.8), 0 4px 0 rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 35; /* 确保出纸口的盖子在纸张前方 */
+        }
+
+        .paper-wrapper {
+            position: absolute;
+            top: 8px; /* 起点隐藏在黑色的出口边缘之下 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 220px; 
+            height: 400px; /* 增加遮罩高度，避免纸伸出后被切掉下半部 */
+            overflow: hidden; /* 完美遮挡：只隐藏上部还在机身里的纸！ */
+            z-index: 32; /* 纸在出纸口下方，但在机器前方 */
+            pointer-events: none;
+        }
+
+        .paper {
+            width: 100%;
+            margin: 0 auto;
+            background: #fff;
+            color: #000;
+            border: 4px solid #000;
+            border-top: none;
+            padding: 30px 15px 15px;
+            text-align: center;
+            transform: translateY(-100%); /* 未拉动时，100%隐入 overflow:hidden 的黑暗中 */
+            transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background-image: repeating-linear-gradient(transparent, transparent 24px, #ccc 24px, #ccc 26px);
+            background-position: 0 10px;
+            font-family: 'ZCOOL KuaiLe', sans-serif;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            pointer-events: auto;
+        }
+
+        .paper.show {
+            transform: translateY(0); /* 向下推出展示 */
+        }
+
+        .paper-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            color: #5a6988;
+            margin-bottom: 20px;
+            text-decoration: underline;
+            text-transform: uppercase;
+        }
+
+        .paper-result {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            color: #1a1c2c;
+        }
+
+        .paper-flavor {
+            display: inline-block;
+            background: #e43b44;
+            color: white;
+            padding: 5px 10px;
+            border: 2px solid #000;
+            font-size: 16px;
+            box-shadow: 2px 2px 0 #000;
+            transform: rotate(-2deg);
+        }
+
+        /* --- 完美贴合的摇杆 --- */
+        .lever-wrapper {
+            position: absolute;
+            right: -32px; /* 宽度40减去8px重叠，实现完美接缝 */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            z-index: 15; /* 使摇杆在机身外沿上层交接 */
+        }
+
+        .lever-wrapper::after {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px; bottom: -40px; left: -20px;
+            z-index: 1;
+        }
+
+        .lever-base {
+            width: 40px;
+            height: 80px;
+            background: var(--machine-accent); 
+            border: 8px solid #000;
+            border-left: none; /* 去除左侧边框，使其与机器右侧边框融合 */
+            box-shadow: inset -4px -4px 0px rgba(0,0,0,0.5);
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 3;
+        }
+
+        .lever-shaft {
+            width: 24px; /* 加粗杆子 */
+            height: 100px;
+            background: #cbdbfc;
+            border: 8px solid #000; /* 加粗边框 */
+            margin-bottom: -20px;
+            transform-origin: bottom center;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            z-index: 2; /* 藏入base之后 */
+        }
+
+        .lever-ball {
+            width: 48px;
+            height: 48px;
+            background: #e43b44; 
+            border: 8px solid #000; /* 加粗圆球边框 */
+            position: absolute;
+            top: -48px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: inset -6px -6px 0 rgba(0,0,0,0.4), inset 4px 4px 0 rgba(255,255,255,0.6);
+        }
+
+        .lever-wrapper:active .lever-shaft, .lever-wrapper.pulled .lever-shaft {
+            transform: rotateX(180deg) scaleY(0.8);
+        }
+
+        /* 便利贴 */
+        .sticky-note {
+            position: absolute;
+            right: -130px;
+            top: 75%;
+            background: #fbf236;
+            color: #1a1c2c;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 4px solid #000;
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.5);
+            transform: rotate(12deg);
+            z-index: 20;
+            pointer-events: none;
+            white-space: nowrap;
+            font-family: 'ZCOOL KuaiLe', 'Press Start 2P', sans-serif;
+            animation: floatNote 3s ease-in-out infinite;
+        }
+        
+        .sticky-note::before {
+            content: '';
+            position: absolute;
+            top: -10px; left: 50%;
+            transform: translateX(-50%);
+            width: 25px; height: 15px;
+            background: rgba(255,255,255,0.7);
+            border: 2px solid #000;
+        }
+
+        @keyframes floatNote {
+            0%, 100% { transform: rotate(12deg) translateY(0); }
+            50% { transform: rotate(14deg) translateY(-5px); }
+        }
+
+        /* Jackpot Effect */
+        @keyframes flash {
+            0%, 50%, 100% { filter: brightness(1); }
+            25%, 75% { filter: brightness(2) contrast(1.5); }
+        }
+        .jackpot .machine {
+            animation: flash 0.5s ease-in-out 3;
+        }
+        
+        @keyframes rainbow {
+            0% { border-color: #e43b44; }
+            20% { border-color: var(--gold); }
+            40% { border-color: #99e550; }
+            60% { border-color: #5fcde4; }
+            80% { border-color: #d77bba; }
+            100% { border-color: #e43b44; }
+        }
+        .jackpot .screen {
+            animation: rainbow 0.2s linear 10;
+        }
+
+        /* UI 元素 */
+        .top-bar { position: absolute; top: 20px; right: 20px; z-index: 100; }
+
+        .pixel-btn {
+            font-family: 'Press Start 2P', 'ZCOOL KuaiLe', sans-serif;
+            background: #e43b44;
+            color: white;
+            border: 4px solid #000;
+            padding: 10px 15px;
+            cursor: pointer;
+            box-shadow: inset -4px -4px 0px rgba(0,0,0,0.3), inset 4px 4px 0px rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 14px;
+            transition: transform 0.1s;
+        }
+
+        .pixel-btn:active {
+            box-shadow: inset 4px 4px 0px rgba(0,0,0,0.3);
+            transform: translateY(4px);
+        }
+
+        .interesting-btn-container {
+            margin-top: 50px;
+            height: 50px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        .interesting-btn-container.show {
+            opacity: 1;
+            pointer-events: auto;
+            animation: bounce 2s infinite;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .pixel-modal {
+            background: var(--screen-bg);
+            border: 6px solid #e43b44;
+            padding: 40px;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 0 4px #000, inset 4px 4px 0px rgba(255,255,255,0.2);
+            image-rendering: pixelated;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: -20px; right: -20px;
+            width: 40px; height: 40px; padding: 0;
+            font-size: 16px; background: #e43b44;
+        }
+
+        .modal-title { color: var(--gold); font-size: 24px; margin-bottom: 20px; text-shadow: 2px 2px 0px #000; }
+        .modal-desc { color: var(--text-light); font-size: 14px; line-height: 1.6; margin-bottom: 30px; }
+
+    </style>
+</head>
+<body class="lang-zh">
+
+    <div class="top-bar">
+        <button class="pixel-btn" id="lang-toggle">EN</button>
+    </div>
+
+    <h1 id="main-title">今天吃点啥？</h1>
+
+    <div class="arcade-container" id="arcade">
+        <div class="machine">
+            <!-- 顶棚 -->
+            <div class="machine-marquee">
+                <div class="marquee-light"></div>
+                <div class="marquee-light"></div>
+                <div class="marquee-light"></div>
+                <div class="marquee-light"></div>
+                <div class="marquee-light"></div>
+            </div>
+            
+            <!-- 屏幕区 -->
+            <div class="screen">
+                <div class="labels">
+                    <div class="label" id="label-c">碳水</div>
+                    <div class="label" id="label-p">蛋白质</div>
+                    <div class="label" id="label-g">膳食纤维</div>
+                </div>
+                <div class="slots">
+                    <div class="column-wrapper"><div class="reel" id="reel-carbon"></div></div>
+                    <div class="column-wrapper"><div class="reel" id="reel-protein"></div></div>
+                    <div class="column-wrapper"><div class="reel" id="reel-green"></div></div>
+                </div>
+            </div>
+            
+            <!-- 投币及底部出纸面板区 -->
+            <div class="machine-bottom">
+                
+                <!-- 居中出纸口（面板正面朝向观众） -->
+                <div class="printer-center">
+                    <div class="printer-slit"></div>
+                    <div class="paper-wrapper">
+                        <div class="paper" id="paper">
+                            <div class="paper-title"><span id="receipt-label">收据</span> #<span id="receipt-id">0001</span></div>
+                            <div class="paper-result" id="result-text">米饭 + 猪肉 + 白菜</div>
+                            <div class="paper-flavor" id="flavor-text">风味: 爆辣</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 投币器推向右方 -->
+                <div class="coin-slot-wrapper">
+                    <div class="coin-slot-hole"></div>
+                    <img id="anim-coin" class="anim-coin" alt="coin">
+                    <div class="coin-slot-front"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 摇杆与机身边框直接融合 -->
+        <div class="lever-wrapper" id="lever">
+            <div class="lever-base"></div>
+            <div class="lever-shaft">
+                <div class="lever-ball"></div>
+            </div>
+        </div>
+
+        <div class="sticky-note" id="sticky-note">用力拉！</div>
+    </div>
+
+    <div class="interesting-btn-container" id="interesting-container">
+        <button class="pixel-btn" id="interesting-btn" style="background: var(--gold); color: #000;">觉得有趣吗？</button>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="pixel-modal">
+            <button class="pixel-btn close-btn" id="close-modal">X</button>
+            <h2 class="modal-title" id="modal-title">你好！</h2>
+            <p class="modal-desc" id="modal-desc">希望你喜欢这个迷你的像素老虎机！想要看看我其他的作品吗？</p>
+            <a href="https://yishuangguo.github.io/yishuangguo/" target="_blank" class="pixel-btn" id="more-stuff-btn">更多作品！</a>
+        </div>
+    </div>
+
+    <script>
+        // Audio Context setup for retro sounds
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            try {
+                if (!audioCtx && AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch (e) {
+                console.warn("音频初始化失败或被拦截，已静音运行:", e);
+                audioCtx = null;
+            }
+        }
+
+        function playTone(freq, type, duration, vol=0.1) {
+            try {
+                if(!audioCtx) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+
+        function playCoinSound() {
+            try {
+                if(!audioCtx) return;
+                playTone(987.77, 'square', 0.1, 0.05); // B5 note
+                setTimeout(() => playTone(1318.51, 'square', 0.2, 0.05), 100); // E6 note
+            } catch (e) {}
+        }
+
+        function playSpinSound() {
+            playTone(400 + Math.random() * 200, 'square', 0.1, 0.05);
+        }
+
+        function playJackpotSound() {
+            const notes = [440, 554, 659, 880];
+            notes.forEach((freq, i) => {
+                setTimeout(() => playTone(freq, 'square', 0.2, 0.1), i * 150);
+            });
+            setTimeout(() => playTone(880, 'square', 0.4, 0.1), notes.length * 150);
+        }
+
+        // Retro Color Palette for Pixel Art
+        const P = {
+            '_': 'transparent',
+            'k': '#1a1c2c', // Black
+            'w': '#f4f4f4', // White
+            'r': '#d95763', // Red
+            'R': '#ac3232', // Dark Red
+            'g': '#99e550', // Light green
+            'G': '#4b692f', // Dark green
+            'b': '#8f563b', // Brown
+            'B': '#df7126', // Orange
+            'y': '#fbf236', // Yellow
+            'Y': '#df7126', // Dark Yellow/Orange for coin shading
+            'p': '#d77bba', // Pink
+            'P': '#5d275d', // Purple
+            'c': '#5fcde4', // Cyan
+            'S': '#cbdbfc', // Silver
+            's': '#5a6988'  // Dark Grey
+        };
+
+        let currentLang = 'zh';
+        let pullCount = 0;
+
+        const i18n = {
+            zh: {
+                title: '今天吃点啥？',
+                langBtn: 'EN',
+                carbon: '碳水', protein: '蛋白质', green: '膳食纤维',
+                receipt: '收据', flavorPrefix: '风味: ',
+                interestingBtn: '觉得有趣吗？',
+                modalTitle: '你好！',
+                modalDesc: '希望你喜欢这个迷你的像素老虎机！想要看看我其他的作品吗？',
+                moreStuffBtn: '更多作品！',
+                stickyNote: '用力拉！'
+            },
+            en: {
+                title: 'WHAT TO EAT NEXT?',
+                langBtn: '中文',
+                carbon: 'CARBON', protein: 'PROTEIN', green: 'GREEN',
+                receipt: 'RECEIPT', flavorPrefix: 'Flavor: ',
+                interestingBtn: 'FIND IT INTERESTING?',
+                modalTitle: 'HELLO!',
+                modalDesc: 'Hope you enjoyed this little pixel slot machine! Check out more of my stuff!',
+                moreStuffBtn: 'MORE STUFF!',
+                stickyNote: 'PULL HARD!'
+            }
+        };
+
+        // --- 金币像素画矩阵 ---
+        const coinArt = [
+            '__yyyy__',
+            '_yYYYYy_',
+            'yYyyyyYy',
+            'yYyYYyYy',
+            'yYyYYyYy',
+            'yYyyyyYy',
+            '_yYYYYy_',
+            '__yyyy__'
+        ];
+
+        // 食材矩阵
+        const ingredients = {
+            carbon: [
+                { nameZh: '米饭', nameEn: 'Rice', art: [
+                    '__wwww__','_wwwwww_','wwwwwwww','kwwwwwwk','kbbbbbbk','_kbbbbk_','__kbbk__','___kk___'
+                ]},
+                { nameZh: '杂粮米', nameEn: 'Grains', art: [
+                    '__PwwP__','_wPwwPw_','PwPwwPww','kwPwwPwk','kbbbbbbk','_kbbbbk_','__kbbk__','___kk___'
+                ]},
+                { nameZh: '面条', nameEn: 'Noodle', art: [
+                    '__y_y___','_yyyyy__','_yyyyyy_','kyyyyyyk','krrrrrrk','_krrrrk_','__krrk__','___kk___'
+                ]},
+                { nameZh: '魔芋丝', nameEn: 'Konjac', art: [
+                    '__S_S___','_SwSww__','_SSwSSw_','kSwSSwwk','kssssssk','_kssssk_','__kssk__','___kk___'
+                ]}
+            ],
+            protein: [
+                { nameZh: '鱼肉', nameEn: 'Fish', art: [
+                    '________','___SS___','__SccS_S','_SckccSS','SccccccS','_SccccSS','__SccS_S','___SS___'
+                ]},
+                { nameZh: '猪肉', nameEn: 'Pork', art: [
+                    '________','__kkkk__','_kwwwwk_','kwppppwk','kppppppk','_kppppk_','__kkkk__','________'
+                ]},
+                { nameZh: '牛肉', nameEn: 'Beef', art: [
+                    '________','__kkkk__','_kwwwwk_','kwRkRbwk','kRkRkRbk','_kRkRbk_','__kkkk__','________'
+                ]},
+                { nameZh: '贝壳', nameEn: 'Clam', art: [
+                    '________','___kk___','__kbbk__','_kbbbbk_','kb_bb_bk','kbbbbbbk','_kkkkkk_','________'
+                ]},
+                { nameZh: '虾', nameEn: 'Shrimp', art: [
+                    '________','__kkk___','_kBBBk__','kBBk____','_kBBk___','__kBBBk_','_kBBBk__','__kkk___'
+                ]},
+                { nameZh: '羊肉', nameEn: 'Lamb', art: [
+                    '________','_ww_____','_kwwkk__','__kwRRk_','___kRRRk','___kRRRk','____kkk_','________'
+                ]}
+            ],
+            green: [
+                { nameZh: '白菜', nameEn: 'Cabbage', art: [
+                    '________','__kGGk__','_kGwwGk_','kGgwwgGk','kgGwwGgk','_kGwwGk_','__kkkk__','________'
+                ]},
+                { nameZh: '青菜', nameEn: 'Greens', art: [
+                    '________','_kGGGGk_','kGGGGGGk','kGgGGgGk','_kwGgwk_','__kwwk__','__kwwk__','___kk___'
+                ]},
+                { nameZh: '花椰菜', nameEn: 'Broccoli', art: [
+                    '________','__kGGk__','_kGGGGk_','kGGGGGGk','_kGGGGk_','__kggk__','__kggk__','___kk___'
+                ]},
+                { nameZh: '豆苗', nameEn: 'Shoots', art: [
+                    '________','__g__g__','_kg__gk_','__k__k__','__k__k__','_Gk__kG_','_kG__Gk_','__k__k__'
+                ]},
+                { nameZh: '胡萝卜', nameEn: 'Carrot', art: [
+                    '________','___g____','__kgk___','__kBk___','_kBBk___','_kBBk___','__kBk___','___k____'
+                ]}
+            ]
+        };
+
+        const flavorsZh = ["清淡", "爆辣", "酸甜", "蒜香", "红烧", "清蒸", "咖喱", "黑椒", "葱爆", "椒盐", "麻酱"];
+        const flavorsEn = ["Mild", "Spicy", "Sweet & Sour", "Garlic", "Braised", "Steamed", "Curry", "Black Pepper", "Scallion", "Salt & Pepper", "Sesame"];
+
+        function getFlavor() {
+            const arr = currentLang === 'zh' ? flavorsZh : flavorsEn;
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Pixel Art Renderer
+        function createPixelArtSrc(artArray) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const size = 8;
+            const scale = 8; 
+            canvas.width = size * scale;
+            canvas.height = size * scale;
+
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    const colorCode = artArray[y][x];
+                    ctx.fillStyle = P[colorCode] || P['_'];
+                    ctx.fillRect(x * scale, y * scale, scale, scale);
+                }
+            }
+            return canvas.toDataURL('image/png');
+        }
+
+        // 生成金币图像
+        document.getElementById('anim-coin').src = createPixelArtSrc(coinArt);
+
+        // Setup Reels
+        const ITEM_HEIGHT = 120;
+        const REEL_SPINS = 5; 
+        
+        let currentState = { carbon: 0, protein: 0, green: 0 };
+        let isSpinning = false;
+        let receiptCount = 1;
+
+        function populateReel(elementId, items) {
+            const reel = document.getElementById(elementId);
+            reel.innerHTML = '';
+            
+            items.forEach(item => {
+                if(!item.src) item.src = createPixelArtSrc(item.art);
+            });
+
+            for (let i = 0; i < REEL_SPINS + 1; i++) {
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    const displayName = currentLang === 'zh' ? item.nameZh : item.nameEn;
+                    div.className = 'item';
+                    div.innerHTML = `<img src="${item.src}" alt="${displayName}"><span>${displayName}</span>`;
+                    reel.appendChild(div);
+                });
+            }
+            reel.style.transform = `translateY(0px)`;
+        }
+
+        function updateUI() {
+            // 通过 class 应用语言排版规则
+            document.body.className = `lang-${currentLang}`;
+
+            const texts = i18n[currentLang];
+            document.getElementById('main-title').innerText = texts.title;
+            document.getElementById('lang-toggle').innerText = texts.langBtn;
+            document.getElementById('label-c').innerText = texts.carbon;
+            document.getElementById('label-p').innerText = texts.protein;
+            document.getElementById('label-g').innerText = texts.green;
+            document.getElementById('receipt-label').innerText = texts.receipt;
+            document.getElementById('interesting-btn').innerText = texts.interestingBtn;
+            document.getElementById('modal-title').innerText = texts.modalTitle;
+            document.getElementById('modal-desc').innerText = texts.modalDesc;
+            document.getElementById('more-stuff-btn').innerText = texts.moreStuffBtn;
+            document.getElementById('sticky-note').innerText = texts.stickyNote;
+            
+            populateReel('reel-carbon', ingredients.carbon);
+            populateReel('reel-protein', ingredients.protein);
+            populateReel('reel-green', ingredients.green);
+
+            document.getElementById('paper').classList.remove('show');
+        }
+
+        document.getElementById('lang-toggle').addEventListener('click', () => {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            updateUI();
+        });
+
+        updateUI();
+
+        const lever = document.getElementById('lever');
+        const paper = document.getElementById('paper');
+
+        function spinReel(elementId, items, duration, callback) {
+            const reel = document.getElementById(elementId);
+            const totalItems = items.length;
+            
+            const targetIndex = Math.floor(Math.random() * totalItems);
+            
+            reel.style.transition = 'none';
+            reel.style.transform = `translateY(-${currentState[elementId] * ITEM_HEIGHT}px)`;
+            
+            void reel.offsetWidth;
+
+            const finalY = -((REEL_SPINS * totalItems) + targetIndex) * ITEM_HEIGHT;
+            
+            reel.style.transition = `transform ${duration}s cubic-bezier(0.15, 0.85, 0.15, 1)`;
+            reel.classList.add('blur');
+            reel.style.transform = `translateY(${finalY}px)`;
+
+            let soundInterval = setInterval(playSpinSound, 100);
+
+            setTimeout(() => {
+                clearInterval(soundInterval);
+                reel.classList.remove('blur');
+                currentState[elementId] = targetIndex;
+                
+                setTimeout(() => {
+                    reel.style.transition = 'none';
+                    reel.style.transform = `translateY(-${targetIndex * ITEM_HEIGHT}px)`;
+                }, 50);
+
+                const resultName = currentLang === 'zh' ? items[targetIndex].nameZh : items[targetIndex].nameEn;
+                if (callback) callback(resultName);
+            }, duration * 1000);
+        }
+
+        function triggerPullSequence() {
+            if (isSpinning) return;
+            initAudio(); 
+            isSpinning = true;
+
+            // 隐藏旧纸条
+            paper.classList.remove('show');
+
+            // 1. 触发金币动画
+            const coin = document.getElementById('anim-coin');
+            coin.classList.remove('play');
+            void coin.offsetWidth; // 强制重绘
+            coin.classList.add('play');
+
+            // 2. 播放金币掉入的声音（设置在金币碰到投币口的时刻）
+            setTimeout(() => {
+                playCoinSound();
+            }, 300);
+
+            // 3. 稍作延迟后，开始拉动拉杆与老虎机运转
+            setTimeout(() => {
+                executeSlotSpin();
+            }, 600);
+        }
+
+        function executeSlotSpin() {
+            lever.classList.add('pulled');
+            setTimeout(() => lever.classList.remove('pulled'), 300);
+
+            const results = {};
+            let reelsFinished = 0;
+
+            const checkDone = () => {
+                reelsFinished++;
+                if (reelsFinished === 3) {
+                    document.getElementById('arcade').classList.add('jackpot');
+                    playJackpotSound();
+                    
+                    setTimeout(() => {
+                        document.getElementById('arcade').classList.remove('jackpot');
+                        showPaper(results);
+                        isSpinning = false;
+
+                        // 彩蛋：拉动 3 次后显示按钮
+                        pullCount++;
+                        if (pullCount >= 3) {
+                            document.getElementById('interesting-container').classList.add('show');
+                        }
+                    }, 1500);
+                }
+            };
+
+            setTimeout(() => spinReel('reel-carbon', ingredients.carbon, 2.0, res => { results.c = res; checkDone(); }), 0);
+            setTimeout(() => spinReel('reel-protein', ingredients.protein, 2.5, res => { results.p = res; checkDone(); }), 0);
+            setTimeout(() => spinReel('reel-green', ingredients.green, 3.0, res => { results.g = res; checkDone(); }), 0);
+        }
+
+        function showPaper(results) {
+            document.getElementById('receipt-id').innerText = String(receiptCount++).padStart(4, '0');
+            document.getElementById('result-text').innerText = `${results.c} + ${results.p} + ${results.g}`;
+            document.getElementById('flavor-text').innerText = `${i18n[currentLang].flavorPrefix}${getFlavor()}`;
+            
+            paper.classList.add('show');
+        }
+
+        // 使用 pointerdown 让交互更加精准流畅
+        lever.addEventListener('pointerdown', (e) => {
+            e.preventDefault(); 
+            triggerPullSequence();
+        });
+
+        // 模态框交互
+        document.getElementById('interesting-btn').addEventListener('click', () => {
+            document.getElementById('modal').classList.add('show');
+        });
+
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('modal').classList.remove('show');
+        });
+
+    </script>
+</body>
+</html>
